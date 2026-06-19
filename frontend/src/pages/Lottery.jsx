@@ -81,7 +81,8 @@ const Lottery = () => {
       }
 
       // 找到中奖奖品在列表中的索引
-      let winnerIdx = prizes.length - 1; // 默认最后一个（通常是"谢谢参与"）
+      const noPrizeIdx = prizes.findIndex(p => p.name.includes('谢谢参与'));
+      let winnerIdx = noPrizeIdx !== -1 ? noPrizeIdx : 0;
       
       if (response.data.is_winner && response.data.prize) {
         const index = prizes.findIndex(p => p.id === response.data.prize.id);
