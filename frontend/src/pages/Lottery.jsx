@@ -81,8 +81,13 @@ const Lottery = () => {
       }
 
       // 找到中奖奖品在列表中的索引
-      let winnerIdx = prizes.length - 1; // 默认最后一个（通常是"谢谢参与"）
-      
+      // 未中奖时应停在"谢谢参与"扇区，而非按 probability 降序排列后的最后一项（那是一等奖）
+      let loserIdx = prizes.findIndex(p => p.name.includes('谢谢参与'));
+      if (loserIdx === -1) {
+        loserIdx = 0;
+      }
+      let winnerIdx = loserIdx;
+
       if (response.data.is_winner && response.data.prize) {
         const index = prizes.findIndex(p => p.id === response.data.prize.id);
         if (index !== -1) {
