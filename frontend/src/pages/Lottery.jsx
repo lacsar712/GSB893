@@ -81,12 +81,31 @@ const Lottery = () => {
       }
 
       // 找到中奖奖品在列表中的索引
-      let winnerIdx = prizes.length - 1; // 默认最后一个（通常是"谢谢参与"）
-      
+      let winnerIdx = -1;
+
       if (response.data.is_winner && response.data.prize) {
         const index = prizes.findIndex(p => p.id === response.data.prize.id);
         if (index !== -1) {
           winnerIdx = index;
+        }
+      } else {
+        // 未中奖：定位到"谢谢参与"对应的扇区，避免停在一等奖位置造成与弹窗不符
+        const thanksIdx = prizes.findIndex(p => /谢谢参与|未中奖|谢谢惠顾/.test(p?.name || ''));
+        if (thanksIdx !== -1) {
+          winnerIdx = thanksIdx;
+        } else {
+          // 兜底：选取概率最大的奖项（通常即为未中奖项）
+          let maxProb = -Infinity;
+          prizes.forEach((p, i) => {
+            const prob = Number(p?.probability) || 0;
+            if (prob > maxProb) {
+              maxProb = prob;
+              winnerIdx = i;
+            }
+          });
+          if (winnerIdx === -1) {
+            winnerIdx = prizes.length - 1;
+          }
         }
       }
 
